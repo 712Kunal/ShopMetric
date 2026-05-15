@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import logger from './utils/logger.js';
 import ApiResponse from './utils/ApiResponse.js';
+import connectDB from './config/supabase.js';
 
 const app = express();
 
@@ -17,7 +18,11 @@ app.use(
   })
 );
 
+// Database connection
+connectDB();
+
 import errorMiddleware from './middlewares/error.middleware.js';
+import authRoutes from './routes/auth.routes.js';
 
 // Health-check
 app.get('/', (req, res) => {
@@ -25,6 +30,7 @@ app.get('/', (req, res) => {
 });
 
 // public route
+app.use('/api/auth', authRoutes);
 
 // private routes
 
