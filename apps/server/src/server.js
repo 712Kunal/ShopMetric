@@ -23,16 +23,15 @@ connectDB();
 
 import errorMiddleware from './middlewares/error.middleware.js';
 import authRoutes from './routes/auth.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 // Health-check
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   res.json(new ApiResponse(200, 'Server is running successfully'));
 });
 
-// public route
 app.use('/api/auth', authRoutes);
-
-// private routes
+app.use('/api/admin', adminRoutes);
 
 app.use(errorMiddleware);
 
