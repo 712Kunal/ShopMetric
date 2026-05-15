@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
-import logger from "../utils/logger.js";
-import ApiError from "../utils/ApiError.js";
+import jwt from 'jsonwebtoken';
+import logger from '../utils/logger.js';
+import ApiError from '../utils/ApiError.js';
 
 // FLOW -->
 // Login → accessToken returned in JSON → store in memory
@@ -18,21 +18,25 @@ export const authMiddleware = (req, res, next) => {
   // Authorization: Bearer <accessToken>
 
   if (!authHeader) {
-    logger.error("No token provided");
-    throw new ApiError(401, "No token provided");
+    logger.error('No token provided');
+    throw new ApiError(401, 'No token provided');
   }
 
-  const token = authHeader.split(" ")[1];
+  const token = authHeader.split(' ')[1];
+
+  if (!token) {
+    return next(new ApiError(401, 'No token provided'));
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    req.userId = decoded.userId;
+    req.user = decoded;
     next();
   } catch (error) {
     next(
       error instanceof ApiError
         ? error
-        : new ApiError(403, error.message, error.stack, false),
+        : new ApiError(403, error.message, error.stack, false)
     );
   }
 };

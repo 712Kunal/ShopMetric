@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import { supabase } from '../config/supabase.js';
@@ -20,9 +20,12 @@ const REFRESH_COOKIE_OPTIONS = {
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, address, password } = req.validated.body;
+    const { name, email, address, password, role } = req.validated.body;
 
-    // Check existing user
+    if (role === 'admin') {
+      return next(new ApiError(403, 'Admin registration is not allowed'));
+    }
+
     const { data: existingUser, error: fetchError } = await supabase
       .from('users')
       .select('id')
@@ -52,7 +55,9 @@ export const register = async (req, res, next) => {
           email,
           address: address || null,
           password: hashedPassword,
-          role: 'user',
+
+          // Default role = user
+          role: role || 'user',
         },
       ])
       .select('id, name, email, role')
@@ -63,7 +68,10 @@ export const register = async (req, res, next) => {
     }
 
     logger.info(
-      { userId: newUser.id },
+      {
+        userId: newUser.id,
+        role: newUser.role,
+      },
       'User registration successful'
     );
 
@@ -72,13 +80,8 @@ export const register = async (req, res, next) => {
         user: newUser,
       })
     );
-
   } catch (error) {
-    next(
-      error instanceof ApiError
-        ? error
-        : new ApiError(500, error.message)
-    );
+    next(error instanceof ApiError ? error : new ApiError(500, error.message));
   }
 };
 
@@ -86,7 +89,6 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.validated.body;
 
-    // Find user
     const { data: user, error: findError } = await supabase
       .from('users')
       .select('*')
@@ -94,29 +96,20 @@ export const login = async (req, res, next) => {
       .single();
 
     if (findError || !user) {
-      return next(
-        new ApiError(401, 'Invalid credentials')
-      );
+      return next(new ApiError(401, 'Invalid credentials'));
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return next(
-        new ApiError(401, 'Invalid credentials')
-      );
+      return next(new ApiError(401, 'Invalid credentials'));
     }
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+    logger.info(refreshToken);
 
-    const hashedRefreshToken = await bcrypt.hash(
-      refreshToken,
-      10
-    );
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
     const { error: updateError } = await supabase
       .from('users')
@@ -126,22 +119,13 @@ export const login = async (req, res, next) => {
       .eq('id', user.id);
 
     if (updateError) {
-      return next(
-        new ApiError(500, updateError.message)
-      );
+      return next(new ApiError(500, updateError.message));
     }
 
     // Set cookie
-    res.cookie(
-      'refreshToken',
-      refreshToken,
-      REFRESH_COOKIE_OPTIONS
-    );
+    res.cookie('refreshToken', refreshToken, REFRESH_COOKIE_OPTIONS);
 
-    logger.info(
-      { userId: user.id },
-      'User logged in successfully'
-    );
+    logger.info({ userId: user.id }, 'User logged in successfully');
 
     return res.status(200).json(
       new ApiResponse(200, 'Login successful', {
@@ -154,34 +138,20 @@ export const login = async (req, res, next) => {
         accessToken,
       })
     );
-
   } catch (error) {
-    next(
-      error instanceof ApiError
-        ? error
-        : new ApiError(500, error.message)
-    );
+    next(error instanceof ApiError ? error : new ApiError(500, error.message));
   }
 };
 
-export const refreshAccessToken = async (
-  req,
-  res,
-  next
-) => {
+export const refreshAccessToken = async (req, res, next) => {
   try {
     const token = req.cookies.refreshToken;
 
     if (!token) {
-      return next(
-        new ApiError(401, 'Refresh token missing')
-      );
+      return next(new ApiError(401, 'Refresh token missing'));
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.REFRESH_TOKEN_SECRET
-    );
+    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
     const { data: user, error } = await supabase
       .from('users')
@@ -190,32 +160,22 @@ export const refreshAccessToken = async (
       .single();
 
     if (error || !user) {
-      return next(
-        new ApiError(401, 'Invalid refresh token')
-      );
+      return next(new ApiError(401, 'Invalid refresh token'));
     }
 
-    const isValid = await bcrypt.compare(
-      token,
-      user.refresh_token
-    );
+    const isValid = await bcrypt.compare(token, user.refresh_token);
 
     if (!isValid) {
-      return next(
-        new ApiError(401, 'Invalid refresh token')
-      );
+      return next(new ApiError(401, 'Invalid refresh token'));
     }
 
     const accessToken = generateAccessToken(user);
 
     return res.status(200).json(
-      new ApiResponse(
-        200,
-        'Access token refreshed successfully',
-        { accessToken }
-      )
+      new ApiResponse(200, 'Access token refreshed successfully', {
+        accessToken,
+      })
     );
-
   } catch (error) {
     next(
       error instanceof ApiError
@@ -225,18 +185,11 @@ export const refreshAccessToken = async (
   }
 };
 
-export const updatePassword = async (
-  req,
-  res,
-  next
-) => {
+export const updatePassword = async (req, res, next) => {
   try {
     const { password } = req.validated.body;
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      10
-    );
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const { error } = await supabase
       .from('users')
@@ -246,37 +199,20 @@ export const updatePassword = async (
       .eq('id', req.user.id);
 
     if (error) {
-      return next(
-        new ApiError(400, error.message)
-      );
+      return next(new ApiError(400, error.message));
     }
 
-    logger.info(
-      { userId: req.user.id },
-      'Password updated successfully'
-    );
+    logger.info({ userId: req.user.id }, 'Password updated successfully');
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        'Password updated successfully'
-      )
-    );
-
+    return res
+      .status(200)
+      .json(new ApiResponse(200, 'Password updated successfully'));
   } catch (error) {
-    next(
-      error instanceof ApiError
-        ? error
-        : new ApiError(500, error.message)
-    );
+    next(error instanceof ApiError ? error : new ApiError(500, error.message));
   }
 };
 
-export const logout = async (
-  req,
-  res,
-  next
-) => {
+export const logout = async (req, res, next) => {
   try {
     const { error } = await supabase
       .from('users')
@@ -286,34 +222,18 @@ export const logout = async (
       .eq('id', req.user.id);
 
     if (error) {
-      return next(
-        new ApiError(500, error.message)
-      );
+      return next(new ApiError(500, error.message));
     }
 
     // Clear cookie
-    res.clearCookie(
-      'refreshToken',
-      REFRESH_COOKIE_OPTIONS
-    );
+    res.clearCookie('refreshToken', REFRESH_COOKIE_OPTIONS);
 
-    logger.info(
-      { userId: req.user.id },
-      'User logged out successfully'
-    );
+    logger.info({ userId: req.user.id }, 'User logged out successfully');
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        'Logged out successfully'
-      )
-    );
-
+    return res
+      .status(200)
+      .json(new ApiResponse(200, 'Logged out successfully'));
   } catch (error) {
-    next(
-      error instanceof ApiError
-        ? error
-        : new ApiError(500, error.message)
-    );
+    next(error instanceof ApiError ? error : new ApiError(500, error.message));
   }
 };

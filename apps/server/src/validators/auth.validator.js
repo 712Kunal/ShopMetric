@@ -13,7 +13,7 @@ export const registerSchema = z.object({
 
     address: z.string().max(400, 'Address too long').optional(),
 
-    role: z.enum(['admin', 'user', 'store_owner']).optional(),
+    role: z.enum(['user', 'store_owner']).optional(),
   }),
 
   query: z.object({}).optional(),
@@ -27,6 +27,15 @@ export const loginSchema = z.object({
     password: z.string().min(6, 'Password must be at least 6 characters long'),
   }),
 
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});
+
+export const passwordSchema = z.object({
+  body: z.object({
+    password: z.string().min(6, 'Password must be at least 6 characters long'),
+  }),
+  
   query: z.object({}).optional(),
   params: z.object({}).optional(),
 });
