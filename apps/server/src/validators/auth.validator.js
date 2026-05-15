@@ -12,8 +12,6 @@ export const registerSchema = z.object({
     password: z.string().min(6, 'Password must be at least 6 characters long'),
 
     address: z.string().max(400, 'Address too long').optional(),
-
-    role: z.enum(['user', 'store_owner']).optional(),
   }),
 
   query: z.object({}).optional(),

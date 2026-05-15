@@ -20,11 +20,7 @@ const REFRESH_COOKIE_OPTIONS = {
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, address, password, role } = req.validated.body;
-
-    if (role === 'admin') {
-      return next(new ApiError(403, 'Admin registration is not allowed'));
-    }
+    const { name, email, address, password } = req.validated.body;
 
     const { data: existingUser, error: fetchError } = await supabase
       .from('users')
@@ -55,9 +51,7 @@ export const register = async (req, res, next) => {
           email,
           address: address || null,
           password: hashedPassword,
-
-          // Default role = user
-          role: role || 'user',
+          role: 'user',
         },
       ])
       .select('id, name, email, role')
