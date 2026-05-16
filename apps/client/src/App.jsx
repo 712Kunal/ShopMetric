@@ -1,4 +1,4 @@
-import { Suspense, lazy, memo } from 'react';
+import { lazy, memo } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router';
 import { ToastContainer } from 'react-toastify';
 
@@ -36,7 +36,22 @@ function App() {
           <Route element={AuthLayout}>
             <Route path="/app" element={<AppLayout />}></Route>
           </Route>
+
+          <Route path="/unauthorized" element={<AccessDenied />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </Router>
     </div>
   );
