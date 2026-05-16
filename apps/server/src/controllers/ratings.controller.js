@@ -42,7 +42,7 @@ export const submitRating = async (req, res, next) => {
 
 export const updateRating = async (req, res, next) => {
   try {
-    const { value } = req.value;
+    const { value } = req.body;
     if (value < 1 || value > 5) {
       return next(new ApiError(409, 'Rating must be between 1 to 5'));
     }
