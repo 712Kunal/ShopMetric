@@ -36,7 +36,9 @@ export const listStores = async (req, res, next) => {
           .eq('store_id', store.id);
 
         const avgRating = ratings?.length
-          ? ratings.reduce((s, r) => s + r.value, 0) / ratings.length
+          ? (ratings.reduce((s, r) => s + r.value, 0) / ratings.length).toFixed(
+              1
+            )
           : null;
 
         const myRating =

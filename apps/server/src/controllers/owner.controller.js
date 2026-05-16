@@ -26,7 +26,7 @@ export const getDashboard = async (req, res, next) => {
     }
 
     const avgRatings = ratings?.length
-      ? ratings.reduce((s, r) => s + r.value, 0)
+      ? (ratings.reduce((s, r) => s + r.value, 0) / ratings.length).toFixed(1)
       : null;
 
     const responseData = {
