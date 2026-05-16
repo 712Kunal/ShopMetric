@@ -88,8 +88,8 @@ export const getStoreById = async (req, res, next) => {
     };
 
     return res
-      .json(201)
-      .json(new ApiResponse(201), 'Store fetched successfully', responseData);
+      .status(201)
+      .json(new ApiResponse(201, 'Store fetched successfully', responseData));
   } catch (error) {
     next(error instanceof ApiError ? error : new ApiError(500, error.message));
   }
