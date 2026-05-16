@@ -1,7 +1,7 @@
-import { supabase } from '../config/supabase';
-import ApiError from '../utils/ApiError';
-import ApiResponse from '../utils/ApiResponse';
-import logger from '../utils/logger';
+import { supabase } from '../config/supabase.js';
+import ApiError from '../utils/ApiError.js';
+import ApiResponse from '../utils/ApiResponse.js';
+import logger from '../utils/logger.js';
 
 export const getDashboard = async (req, res, next) => {
   try {

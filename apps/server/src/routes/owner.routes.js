@@ -11,3 +11,5 @@ router.get(
   roleGuard('store_owner'),
   getDashboard
 );
+
+export default router;
