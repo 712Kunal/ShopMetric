@@ -52,4 +52,10 @@ export const AdminApi = createApi({
   }),
 });
 
-export const { useGetDashboardQuery } = AdminApi;
+export const {
+  useGetDashboardQuery,
+  useCreateStoreMutation,
+  useListUsersQuery,
+  useGetUserDetailsQuery,
+  useListStoresQuery,
+} = AdminApi;

@@ -17,3 +17,5 @@ export const ownerApi = createApi({
     }),
   }),
 });
+
+export const { useGetDashboardQuery } = ownerApi;
