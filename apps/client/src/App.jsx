@@ -1,5 +1,11 @@
 import { lazy, memo } from 'react';
-import { Route, BrowserRouter as Router, Routes } from 'react-router';
+import {
+  Route,
+  BrowserRouter as Router,
+  Routes,
+  Navigate,
+  Outlet,
+} from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
 const LandingPage = lazy(
@@ -19,6 +25,9 @@ const RegisterPage = lazy(
 
 const NotFoundPage = lazy(() => import('@/shared/pages/NotFoundPage.jsx'));
 const AccessDenied = lazy(() => import('@/shared/pages/AccessDeniedPage.jsx'));
+const UpdatePassword = lazy(
+  () => import('@/features/auth/pages/UpdatePasswordPage.jsx')
+);
 
 // admin routes
 const AdminDashboard = lazy(
@@ -51,6 +60,41 @@ const OwnerDashboard = lazy(
   () => import('@/features/Roles/store owner/pages/OwnerDashboard')
 );
 
+import { useSelector } from 'react-redux';
+import {
+  selectAccessToken,
+  selectCurrentUser,
+} from '@/features/auth/state/slices/userSlice';
+
+const ProtectedRoute = ({ allowedRoles }) => {
+  const UserToken = useSelector(selectAccessToken);
+  const currentUser = useSelector(selectCurrentUser);
+  const UserRole = currentUser?.role;
+
+  if (!UserRole) {
+    return <Navigate to="/" />;
+  }
+
+  if (!UserToken) {
+    return <Navigate to="/" />;
+  }
+
+  if (allowedRoles.includes(UserRole.trim().toLowerCase())) {
+    return <Outlet />;
+  }
+
+  switch (UserRole.trim().toLowerCase()) {
+    case 'admin':
+      return <Navigate to="/app/admin/dashboard" />;
+    case 'user':
+      return <Navigate to="/app/user/stores" />;
+    case 'store_owner':
+      return <Navigate to="/app/owner/dashboard" />;
+    default:
+      return <Navigate to="/" />;
+  }
+};
+
 function App() {
   return (
     <div className="w-screen h-screen flex flex-col bg-background overflow-hidden">
@@ -65,25 +109,35 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path="/app" element={<AppLayout />}>
               {/* admin */}
-              <Route path="admin/dashboard" element={<AdminDashboard />} />
-              <Route path="admin/users" element={<AdminUsers />} />
-              <Route path="admin/users/create" element={<AdminCreateUser />} />
-              <Route path="admin/users/:id" element={<AdminUserDetail />} />
-              <Route path="admin/stores" element={<AdminStores />} />
-              <Route
-                path="admin/stores/create"
-                element={<AdminCreateStore />}
-              />
-              {/* <Route path="/update-password" element={<UpdatePassword />} /> */}
+              <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                <Route path="admin/dashboard" element={<AdminDashboard />} />
+                <Route path="admin/users" element={<AdminUsers />} />
+                <Route
+                  path="admin/users/create"
+                  element={<AdminCreateUser />}
+                />
+                <Route path="admin/users/:id" element={<AdminUserDetail />} />
+                <Route path="admin/stores" element={<AdminStores />} />
+                <Route
+                  path="admin/stores/create"
+                  element={<AdminCreateStore />}
+                />
+              </Route>
 
               {/* normal user */}
-              <Route path="user/stores" element={<StoresList />} />
-              <Route path="user/stores/:id" element={<StoreDetail />} />
-              {/* <Route path="/update-password" element={<UpdatePassword />} /> */}
+              <Route element={<ProtectedRoute allowedRoles={['user']} />}>
+                <Route path="user/stores" element={<StoresList />} />
+                <Route path="user/stores/:id" element={<StoreDetail />} />
+              </Route>
 
               {/* store owners */}
-              <Route path="owner/dashboard" element={<OwnerDashboard />} />
-              {/* <Route path="/update-password" element={<UpdatePassword />} /> */}
+              <Route
+                element={<ProtectedRoute allowedRoles={['store_owner']} />}
+              >
+                <Route path="owner/dashboard" element={<OwnerDashboard />} />
+              </Route>
+
+              <Route path="update-password" element={<UpdatePassword />} />
             </Route>
           </Route>
 

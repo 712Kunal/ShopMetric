@@ -110,7 +110,7 @@ const OwnerMenuItems = [
 const SharedMenuItems = [
   {
     title: 'Update Password',
-    path: '/update-password',
+    path: '/app/update-password',
     icon: <KeyRound size={18} />,
   },
 ];
