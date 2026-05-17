@@ -1,11 +1,13 @@
 export const ROUTES = {
   // Public routes
-  LANDING_PAGE: "/",
-  LOGIN: "/login",
-  REGISTER: "/register",
+  LANDING_PAGE: '/',
+  LOGIN: '/login',
+  REGISTER: '/register',
 
-  // protectedRoutes
-  // App routes
-  PROFILE: "/app/user/profile",
-
+  ADMIN_DASHBOARD: '/app/admin/dashboard',
+  ADMIN_USERS: '/app/admin/users',
+  ADMIN_CREATE_USER: '/app/admin/users/create',
+  ADMIN_USER_DETAILS: '/app/admin/users/:id',
+  ADMIN_STORES: '/app/admin/stores',
+  ADMIN_CREATE_STORE: '/app/admin/stores/create',
 };

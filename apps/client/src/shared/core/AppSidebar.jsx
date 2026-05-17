@@ -37,15 +37,16 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { NavUser } from '@/components/ui/nav-user';
+import { ROUTES } from '@/shared/constants/routes.constants';
 
-import { clearCredentials, selectUser, selectRole } from '@/store/authSlice';
+// import { clearCredentials, selectUser, selectRole } from '@/store/authSlice';
 
 // ─── Menu definitions per role ────────────────────────────────────────────────
 
 const AdminMenuItems = [
   {
     title: 'Dashboard',
-    path: '/admin/dashboard',
+    path: ROUTES.ADMIN_DASHBOARD,
     icon: <LayoutDashboard size={18} />,
   },
   {
@@ -55,12 +56,12 @@ const AdminMenuItems = [
     items: [
       {
         title: 'All Users',
-        path: '/admin/users',
+        path: ROUTES.ADMIN_USERS,
         icon: <UserCog size={18} />,
       },
       {
         title: 'Add User',
-        path: '/admin/users/create',
+        path: ROUTES.ADMIN_CREATE_USER,
         icon: <UserPlus size={18} />,
       },
     ],
@@ -72,12 +73,12 @@ const AdminMenuItems = [
     items: [
       {
         title: 'All Stores',
-        path: '/admin/stores',
+        path: ROUTES.ADMIN_STORES,
         icon: <Store size={18} />,
       },
       {
         title: 'Add Store',
-        path: '/admin/stores/create',
+        path: ROUTES.ADMIN_CREATE_STORE,
         icon: <PlusCircle size={18} />,
       },
     ],
@@ -123,8 +124,8 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const location = useLocation();
 
-  const user = useSelector(selectUser);
-  const role = useSelector(selectRole);
+  // const user = useSelector(selectUser);
+  // const role = useSelector(selectRole);
 
   const isActive = (path) => location.pathname === path;
 
@@ -228,9 +229,9 @@ export function AppSidebar() {
       admin: AdminMenuItems,
       user: UserMenuItems,
       store_owner: OwnerMenuItems,
-    }[role] ?? [];
+    }['admin'] ?? [];
 
-  const { label: roleLabel, color: roleColor } = roleDisplay[role] ?? {
+  const { label: roleLabel, color: roleColor } = roleDisplay['admin'] ?? {
     label: 'Unknown',
     color: '#9ca3af',
   };

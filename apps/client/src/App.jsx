@@ -7,7 +7,7 @@ const LandingPage = lazy(
 );
 
 const AuthLayout = lazy(
-  () => import('@/shared/Layouts/AuthLayout.wrapper.jsx')
+  () => import('@/shared/Layouts/AuthLayout.wrapper')
 );
 const AppLayout = lazy(() => import('@/shared/Layouts/AppLayout.wrapper.jsx'));
 const PublicLayout = lazy(
@@ -22,6 +22,25 @@ const RegisterPage = lazy(
 const NotFoundPage = lazy(() => import('@/shared/pages/NotFoundPage.jsx'));
 const AccessDenied = lazy(() => import('@/shared/pages/AccessDeniedPage.jsx'));
 
+const AdminDashboard = lazy(
+  () => import('@/features/Roles/admin/pages/AdminDashboard')
+);
+const AdminUsers = lazy(
+  () => import('@/features/Roles/admin/pages/AdminUsers')
+);
+const AdminCreateUser = lazy(
+  () => import('@/features/Roles/admin/pages/AdminCreateUser')
+);
+const AdminUserDetail = lazy(
+  () => import('@/features/Roles/admin/pages/AdminUserDetail')
+);
+const AdminStores = lazy(
+  () => import('@/features/Roles/admin/pages/AdminStores')
+);
+const AdminCreateStore = lazy(
+  () => import('@/features/Roles/admin/pages/AdminCreateStore')
+);
+
 function App() {
   return (
     <div className="w-screen h-screen flex flex-col bg-background overflow-hidden">
@@ -34,7 +53,18 @@ function App() {
           </Route>
 
           <Route element={<AuthLayout />}>
-            <Route path="/app" element={<AppLayout />}></Route>
+            <Route path="/app" element={<AppLayout />}>
+              <Route path="admin/dashboard" element={<AdminDashboard />} />
+              <Route path="admin/users" element={<AdminUsers />} />
+              <Route path="admin/users/create" element={<AdminCreateUser />} />
+              <Route path="admin/users/:id" element={<AdminUserDetail />} />
+              <Route path="admin/stores" element={<AdminStores />} />
+              <Route
+                path="admin/stores/create"
+                element={<AdminCreateStore />}
+              />
+              {/* <Route path="/update-password" element={<UpdatePassword />} /> */}
+            </Route>
           </Route>
 
           <Route path="/unauthorized" element={<AccessDenied />} />
