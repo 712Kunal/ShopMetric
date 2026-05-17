@@ -3,7 +3,7 @@
 import { ChevronsUpDown, LogOut } from 'lucide-react';
 
 import { useDispatch, useSelector } from 'react-redux';
-// import { clearUser } from '@/redux/Features/auth/userSlice';
+import { toast } from 'react-toastify';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -21,34 +21,47 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/shared/constants/routes.constants';
 
-// import { useLogoutMutation } from '@/redux/Features/auth/Authentication';
-// import { selectUserRole } from '@/redux/Features/auth/userSlice';
-// import { resetNotifications } from '@/redux/Features/Notifications/NotificationSlice';
+import { useLogoutMutation } from '@/features/auth/state/redux-api/Authentication.api';
+import {
+  selectCurrentUser,
+  clearCredentials,
+} from '@/features/auth/state/slices/userSlice';
 
 export function NavUser() {
-  // const [logout] = useLogoutMutation();
+  const [logout] = useLogoutMutation();
   const { isMobile } = useSidebar();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
-  // const Currentuser = useSelector((state) => state.user.user);
-  // const role = useSelector(selectUserRole);
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await logout({
-  //       username: Currentuser.username,
-  //       token: Currentuser.token,
-  //     }).unwrap();
-  //     dispatch(clearUser());
-  //     dispatch(resetNotifications());
-  //     navigate('/');
-  //   } catch (error) {
-  //     console.error('Logout failed:', error);
-  //   }
-  // };
+  const Currentuser = useSelector(selectCurrentUser);
+  const role = Currentuser?.role;
 
-  // Get user initials for avatar fallback
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+
+      dispatch(clearCredentials());
+
+      navigate(ROUTES.LANDING_PAGE);
+
+      toast.success('User logged out successfully 🎉', {
+        position: 'top-right',
+        autoClose: 1000,
+        theme: 'dark',
+      });
+    } catch (error) {
+      console.error('Logout failed:', error);
+
+      toast.error('Logout Failed 😕', {
+        position: 'top-right',
+        autoClose: 1000,
+        theme: 'dark',
+      });
+    }
+  };
+
   const getUserInitials = (name) => {
     if (!name) return 'U';
     return name
@@ -59,7 +72,6 @@ export function NavUser() {
       .slice(0, 2);
   };
 
-  // Format role for display
   const formatRole = (role) => {
     if (!role) return 'User';
     return role
@@ -79,25 +91,21 @@ export function NavUser() {
             >
               <>
                 <Avatar className="h-8 w-8 rounded-lg">
-                  {/* <AvatarImage
-                    src={Currentuser?.avatar || 'https://github.com/shadcn.png'}
-                    alt={Currentuser?.username || 'user'}
-                  /> */}
                   <AvatarImage
-                    src={'https://github.com/shadcn.png'}
-                    alt={'user'}
+                    src={Currentuser?.avatar || 'https://github.com/shadcn.png'}
+                    alt={Currentuser?.name || 'user'}
                   />
                   <AvatarFallback className="rounded-lg">
-                    {/* {getUserInitials(Currentuser?.username)} */}
+                    {getUserInitials(Currentuser?.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate text-white font-semibold">
-                    {/* {Currentuser?.username || 'User'} */}
+                    {Currentuser?.name || 'User'}
                     {'User'}
                   </span>
                   <span className="truncate text-white text-xs">
-                    {formatRole("admin")}
+                    {formatRole('admin')}
                   </span>
                 </div>
               </>
@@ -112,35 +120,31 @@ export function NavUser() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm bg-slate-400 rounded-lg">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm bg-background rounded-lg">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  {/* <AvatarImage
-                    src={Currentuser?.avatar || 'https://github.com/shadcn.png'}
-                    alt={Currentuser?.username || 'user'}
-                  /> */}
                   <AvatarImage
-                    src={'https://github.com/shadcn.png'}
-                    alt={'user'}
+                    src={Currentuser?.avatar || 'https://github.com/shadcn.png'}
+                    alt={Currentuser?.name || 'user'}
                   />
                   <AvatarFallback className="rounded-lg">
-                    {/* {getUserInitials(Currentuser?.username)} */}
+                    {getUserInitials(Currentuser?.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {/* {Currentuser?.username || 'User'} */}
+                    {Currentuser?.name || 'User'}
                   </span>
                   <span className="truncate text-xs">
-                    {/* {Currentuser?.role[0].name || 'No designation'} */}
+                    {role || 'No designation'}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+            <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
               <LogOut />
               <span className="cursor-pointer">Logout</span>
-            </DropdownMenuItem> */}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

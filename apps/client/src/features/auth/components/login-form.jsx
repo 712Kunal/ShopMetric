@@ -18,6 +18,15 @@ import { Input } from '@/components/ui/input';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/shared/constants/routes.constants';
+import { useLoginMutation } from '@/features/auth/state/redux-api/Authentication.api';
+import { useDispatch } from 'react-redux';
+import {
+  setCredentials,
+  setUpdateTokens,
+} from '@/features/auth/state/slices/userSlice';
 
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -38,6 +47,12 @@ const LOGIN_SCHEMA = z.object({
 
 export function LoginForm({ className, ...props }) {
   const [showPassword, setShowPassword] = useState(false);
+  const [generalError, setGeneralError] = useState(null);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [loginUser, { isLoading }] = useLoginMutation();
 
   const form = useForm({
     resolver: zodResolver(LOGIN_SCHEMA),
@@ -51,9 +66,64 @@ export function LoginForm({ className, ...props }) {
   });
 
   const handleSubmit = async (data) => {
-    console.log('Login Data:', data);
+    setGeneralError(null);
 
-    // Your Login API Logic Here
+    try {
+      const payload = {
+        email: data.email,
+        password: data.password,
+      };
+
+      const response = await loginUser(payload).unwrap();
+
+      console.log('login success:', response);
+
+      toast.success('User logged in Successfully 🎉', {
+        position: 'top-right',
+        autoClose: 1000,
+        theme: 'dark',
+      });
+
+      dispatch(
+        setCredentials({
+          user: response.data.user,
+        })
+      );
+      dispatch(
+        setUpdateTokens({
+          accessToken: response.data?.accessToken,
+        })
+      );
+
+      const role = response.data.user.role;
+
+      if (role === 'admin') {
+        navigate(ROUTES.ADMIN_DASHBOARD);
+      } else if (role === 'store_owner') {
+        navigate(ROUTES.OWNER_DASHBOARD);
+      } else if (role === 'user') {
+        navigate(ROUTES.USER_STORE_LIST);
+      } else {
+        navigate('/');
+      }
+
+      form.reset();
+    } catch (error) {
+      console.error('Login Error:', error);
+
+      const backendMessage =
+        error?.data?.message ||
+        error?.data?.error?.message ||
+        'Something went wroung';
+
+      setGeneralError(backendMessage);
+
+      toast.error('Login Failed 😕', {
+        position: 'top-right',
+        autoClose: 1000,
+        theme: 'dark',
+      });
+    }
   };
 
   return (
@@ -65,12 +135,18 @@ export function LoginForm({ className, ...props }) {
     >
       <FieldGroup>
         {/* Header */}
-        <div className="flex flex-col items-center gap-1 text-center">
+        <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Login to your account</h1>
 
           <p className="text-sm text-balance text-muted-foreground">
             Enter your email below to login to your account
           </p>
+
+          {generalError && (
+            <div className="w-full bg-destructive/10 border border-destructive text-destructive px-4 py-2 rounded-md text-sm">
+              {generalError} 😟
+            </div>
+          )}
         </div>
 
         {/* Email */}

@@ -4,54 +4,49 @@ import { AppSidebar } from '@/shared/core/AppSidebar.jsx';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { useSelector } from 'react-redux';
-// import {
-//   selectUserRole,
-//   selectUserToken,
-// } from '../../redux/Features/auth/userSlice';
+import {
+  selectAccessToken,
+  selectCurrentUser,
+} from '@/features/auth/state/slices/userSlice';
 
 function AppWrapper() {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
-  // const userRole = useSelector(selectUserRole);
-  // const userToken = useSelector(selectUserToken);
 
-  // useEffect(() => {
-  //   if (
-  //     (location.pathname === '/app' || location.pathname === '/app/') &&
-  //     userToken
-  //   ) {
-  //     switch (userRole?.trim().toLowerCase()) {
-  //       case 'hr':
-  //         navigate('/app/HrDashboard', { replace: true });
-  //         break;
-  //       case 'admin':
-  //         navigate('/app/admindashboard', { replace: true });
-  //         break;
-  //       case 'employee':
-  //         navigate('/app/employeeDashboard', { replace: true });
-  //         break;
-  //       case 'team leader':
-  //       case 'teamleader':
-  //         navigate('/app/TLDashBoard', { replace: true });
-  //         break;
-  //       case 'projectmanager':
-  //         navigate('/app/PMDashboard', { replace: true });
-  //         break;
-  //       default:
-  //         navigate('/', { replace: true });
-  //         break;
-  //     }
-  //   }
-  // }, [location.pathname, navigate, userRole, userToken]);
+  const userToken = useSelector(selectAccessToken);
+  const user = useSelector(selectCurrentUser);
+
+  const userRole = user?.role;
+
+  useEffect(() => {
+    if (
+      (location.pathname === '/app' || location.pathname === '/app/') &&
+      userToken
+    ) {
+      switch (userRole?.trim().toLowerCase()) {
+        case 'admin':
+          navigate('/app/admin/dashboard', { replace: true });
+          break;
+        case 'store_owner':
+          navigate('/app/owner/dashboard', { replace: true });
+          break;
+        case 'user':
+          navigate('/app/USER_STORE_LIST', { replace: true });
+          break;
+        default:
+          navigate('/', { replace: true });
+          break;
+      }
+    }
+  }, [location.pathname, navigate, userRole, userToken]);
 
   return (
     <div className="w-full h-full flex overflow-hidden bg-background">
       <aside className="h-full">
         <SidebarProvider defaultOpen={false}>
           {isMobile && <SidebarTrigger />}
-          {/* <AppSidebar role={userRole} /> */}
-          <AppSidebar  />
+          <AppSidebar role={userRole} />
         </SidebarProvider>
       </aside>
       <main className="w-full h-full flex-grow overflow-hidden">

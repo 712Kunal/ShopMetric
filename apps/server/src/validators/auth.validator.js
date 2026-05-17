@@ -9,7 +9,13 @@ export const registerSchema = z.object({
 
     email: z.string().email('Invalid email format'),
 
-    password: z.string().min(6, 'Password must be at least 6 characters long'),
+    password: z
+      .string()
+      .min(6, 'Password must be at least 6 characters long')
+      .regex(
+        /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/,
+        'Password must contain at least one uppercase letter and one special character'
+      ),
 
     address: z.string().max(400, 'Address too long').optional(),
   }),
@@ -22,7 +28,13 @@ export const loginSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email format'),
 
-    password: z.string().min(6, 'Password must be at least 6 characters long'),
+    password: z
+      .string()
+      .min(6, 'Password must be at least 6 characters long')
+      .regex(
+        /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/,
+        'Password must contain at least one uppercase letter and one special character'
+      ),
   }),
 
   query: z.object({}).optional(),
@@ -31,9 +43,15 @@ export const loginSchema = z.object({
 
 export const passwordSchema = z.object({
   body: z.object({
-    password: z.string().min(6, 'Password must be at least 6 characters long'),
+    password: z
+      .string()
+      .min(6, 'Password must be at least 6 characters long')
+      .regex(
+        /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/,
+        'Password must contain at least one uppercase letter and one special character'
+      ),
   }),
-  
+
   query: z.object({}).optional(),
   params: z.object({}).optional(),
 });

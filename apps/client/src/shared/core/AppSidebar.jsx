@@ -39,9 +39,10 @@ import {
 import { NavUser } from '@/components/ui/nav-user';
 import { ROUTES } from '@/shared/constants/routes.constants';
 
-// import { clearCredentials, selectUser, selectRole } from '@/store/authSlice';
-
-// ─── Menu definitions per role ────────────────────────────────────────────────
+import {
+  clearCredentials,
+  selectCurrentUser,
+} from '@/features/auth/state/slices/userSlice';
 
 const AdminMenuItems = [
   {
@@ -120,12 +121,11 @@ const roleDisplay = {
   store_owner: { label: 'Store Owner', color: '#60a5fa' },
 };
 
-export function AppSidebar() {
+export function AppSidebar({ role }) {
   const { open } = useSidebar();
   const location = useLocation();
 
-  // const user = useSelector(selectUser);
-  // const role = useSelector(selectRole);
+  const user = useSelector(selectCurrentUser);
 
   const isActive = (path) => location.pathname === path;
 
@@ -196,7 +196,6 @@ export function AppSidebar() {
         );
       }
 
-      // Regular item
       return (
         <SidebarMenuItem key={item.title}>
           <SidebarMenuButton asChild>
@@ -229,9 +228,9 @@ export function AppSidebar() {
       admin: AdminMenuItems,
       user: UserMenuItems,
       store_owner: OwnerMenuItems,
-    }['store_owner'] ?? [];
+    }[role] ?? [];
 
-  const { label: roleLabel, color: roleColor } = roleDisplay['store_owner'] ?? {
+  const { label: roleLabel, color: roleColor } = roleDisplay[role] ?? {
     label: 'Unknown',
     color: '#9ca3af',
   };
@@ -258,9 +257,7 @@ export function AppSidebar() {
         <SidebarTrigger className="text-white/60 hover:text-white" />
       </SidebarHeader>
 
-      {/* ── Main nav ── */}
       <SidebarContent className="px-2 py-3">
-        {/* Primary role-based items */}
         <SidebarGroup>
           {open && (
             <SidebarGroupLabel className="text-white/30 text-[10px] uppercase tracking-widest px-3 mb-1">
@@ -274,7 +271,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Shared items (password update) */}
         <SidebarGroup className="mt-4">
           {open && (
             <SidebarGroupLabel className="text-white/30 text-[10px] uppercase tracking-widest px-3 mb-1">

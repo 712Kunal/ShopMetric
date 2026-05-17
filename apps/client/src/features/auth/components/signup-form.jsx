@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router';
+import { ROUTES } from '@/shared/constants/routes.constants';
 
 import {
   Field,
@@ -19,6 +22,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 import { Eye, EyeOff } from 'lucide-react';
+
+import { useRegisterMutation } from '@/features/auth/state/redux-api/Authentication.api';
 
 // Validation Schema
 const SIGNUP_SCHEMA = z.object({
@@ -44,6 +49,9 @@ const SIGNUP_SCHEMA = z.object({
 
 export function SignupForm({ className, ...props }) {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const [generalError, setGeneralError] = useState(null);
+  const [registerUser, { isLoading }] = useRegisterMutation();
 
   const form = useForm({
     resolver: zodResolver(SIGNUP_SCHEMA),
@@ -57,9 +65,44 @@ export function SignupForm({ className, ...props }) {
   });
 
   const handleSubmit = async (data) => {
-    console.log('Signup Form Data:', data);
+    setGeneralError(null);
+    try {
+      const payload = {
+        name: data.name,
+        email: data.email,
+        address: data.address,
+        password: data.password,
+      };
 
-    // Your API Logic Here
+      const response = await registerUser(payload).unwrap();
+
+      toast.success('User registered Successfully 🎉', {
+        position: 'top-right',
+        autoClose: 1000,
+        theme: 'dark',
+      });
+
+      console.log('Register Success:', response);
+
+      form.reset();
+
+      navigate(ROUTES.LOGIN);
+    } catch (error) {
+      console.error('Register Error:', error);
+
+      const backendMessage =
+        error?.data?.message ||
+        error?.data?.error?.message ||
+        'Something went wroung';
+
+      setGeneralError(backendMessage);
+
+      toast.error('Registration Failed 😕', {
+        position: 'top-right',
+        autoClose: 1000,
+        theme: 'dark',
+      });
+    }
   };
 
   return (
@@ -71,12 +114,18 @@ export function SignupForm({ className, ...props }) {
     >
       <FieldGroup>
         {/* Header */}
-        <div className="flex flex-col items-center gap-1 text-center">
+        <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Create your account</h1>
 
           <p className="text-sm text-balance text-muted-foreground">
             Fill in the form below to create your account
           </p>
+
+          {generalError && (
+            <div className="w-full bg-destructive/10 border border-destructive text-destructive px-4 py-2 rounded-md text-sm">
+              {generalError} 😟
+            </div>
+          )}
         </div>
 
         {/* Name + Email */}
