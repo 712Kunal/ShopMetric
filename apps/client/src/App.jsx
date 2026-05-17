@@ -6,9 +6,7 @@ const LandingPage = lazy(
   () => import('@/features/landing/pages/LandingPage.jsx')
 );
 
-const AuthLayout = lazy(
-  () => import('@/shared/Layouts/AuthLayout.wrapper')
-);
+const AuthLayout = lazy(() => import('@/shared/Layouts/AuthLayout.wrapper'));
 const AppLayout = lazy(() => import('@/shared/Layouts/AppLayout.wrapper.jsx'));
 const PublicLayout = lazy(
   () => import('@/shared/Layouts/PublicLayout.wrapper.jsx')
@@ -22,6 +20,7 @@ const RegisterPage = lazy(
 const NotFoundPage = lazy(() => import('@/shared/pages/NotFoundPage.jsx'));
 const AccessDenied = lazy(() => import('@/shared/pages/AccessDeniedPage.jsx'));
 
+// admin routes
 const AdminDashboard = lazy(
   () => import('@/features/Roles/admin/pages/AdminDashboard')
 );
@@ -41,6 +40,17 @@ const AdminCreateStore = lazy(
   () => import('@/features/Roles/admin/pages/AdminCreateStore')
 );
 
+// normal user routes
+const StoresList = lazy(() => import('@/features/Roles/user/pages/StoresList'));
+const StoreDetail = lazy(
+  () => import('@/features/Roles/user/pages/StoreDetail')
+);
+
+// store owner routes
+const OwnerDashboard = lazy(
+  () => import('@/features/Roles/store owner/pages/OwnerDashboard')
+);
+
 function App() {
   return (
     <div className="w-screen h-screen flex flex-col bg-background overflow-hidden">
@@ -54,6 +64,7 @@ function App() {
 
           <Route element={<AuthLayout />}>
             <Route path="/app" element={<AppLayout />}>
+              {/* admin */}
               <Route path="admin/dashboard" element={<AdminDashboard />} />
               <Route path="admin/users" element={<AdminUsers />} />
               <Route path="admin/users/create" element={<AdminCreateUser />} />
@@ -63,6 +74,15 @@ function App() {
                 path="admin/stores/create"
                 element={<AdminCreateStore />}
               />
+              {/* <Route path="/update-password" element={<UpdatePassword />} /> */}
+
+              {/* normal user */}
+              <Route path="user/stores" element={<StoresList />} />
+              <Route path="user/stores/:id" element={<StoreDetail />} />
+              {/* <Route path="/update-password" element={<UpdatePassword />} /> */}
+
+              {/* store owners */}
+              <Route path="owner/dashboard" element={<OwnerDashboard />} />
               {/* <Route path="/update-password" element={<UpdatePassword />} /> */}
             </Route>
           </Route>

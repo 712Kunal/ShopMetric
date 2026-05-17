@@ -88,12 +88,12 @@ const AdminMenuItems = [
 const UserMenuItems = [
   {
     title: 'Browse Stores',
-    path: '/stores',
+    path: ROUTES.USER_STORE_LIST,
     icon: <Store size={18} />,
   },
   {
     title: 'My Ratings',
-    path: '/stores?filter=rated',
+    path: ROUTES.USER_STORE_DETAIL,
     icon: <Star size={18} />,
   },
 ];
@@ -101,7 +101,7 @@ const UserMenuItems = [
 const OwnerMenuItems = [
   {
     title: 'My Store Dashboard',
-    path: '/owner/dashboard',
+    path: ROUTES.OWNER_DASHBOARD,
     icon: <BarChart3 size={18} />,
   },
 ];
@@ -229,9 +229,9 @@ export function AppSidebar() {
       admin: AdminMenuItems,
       user: UserMenuItems,
       store_owner: OwnerMenuItems,
-    }['admin'] ?? [];
+    }['store_owner'] ?? [];
 
-  const { label: roleLabel, color: roleColor } = roleDisplay['admin'] ?? {
+  const { label: roleLabel, color: roleColor } = roleDisplay['store_owner'] ?? {
     label: 'Unknown',
     color: '#9ca3af',
   };
