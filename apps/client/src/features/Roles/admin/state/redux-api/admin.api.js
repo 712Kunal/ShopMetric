@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/shared/state/redux-api/base.api.js';
 
 export const AdminApi = createApi({
-  reducerPath: 'adminApi',
+  reducerPath: 'AdminApi',
   baseQuery: baseQueryWithReauth,
   tagTypes: ['Dashboard', 'Users'],
 

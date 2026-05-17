@@ -1,8 +1,27 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { Users, Store, Star } from 'lucide-react';
+import { useGetDashboardQuery } from '@/features/Roles/admin/state/redux-api/admin.api';
 
 const dashboardData = [
   { month: 'Jan', users: 400, stores: 240, ratings: 320 },
@@ -22,11 +41,16 @@ const roleDistribution = [
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b'];
 
 export default function AdminDashboard() {
+  const { data } = useGetDashboardQuery();
+  console.log(data);
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's your platform overview.</p>
+        <p className="text-muted-foreground">
+          Welcome back! Here's your platform overview.
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -37,8 +61,7 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2,847</div>
-            <p className="text-xs text-muted-foreground">+12% from last month</p>
+            <div className="text-2xl font-bold">{data?.data?.users}</div>
           </CardContent>
         </Card>
 
@@ -48,8 +71,7 @@ export default function AdminDashboard() {
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">342</div>
-            <p className="text-xs text-muted-foreground">+8% from last month</p>
+            <div className="text-2xl font-bold">{data?.data?.stores}</div>
           </CardContent>
         </Card>
 
@@ -59,8 +81,7 @@ export default function AdminDashboard() {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5,284</div>
-            <p className="text-xs text-muted-foreground">+15% from last month</p>
+            <div className="text-2xl font-bold">{data?.data?.ratings}</div>
           </CardContent>
         </Card>
       </div>
@@ -70,7 +91,9 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Growth Trend</CardTitle>
-            <CardDescription>Users, Stores, and Ratings over time</CardDescription>
+            <CardDescription>
+              Users, Stores, and Ratings over time
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -107,7 +130,10 @@ export default function AdminDashboard() {
                   dataKey="value"
                 >
                   {roleDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -126,15 +152,36 @@ export default function AdminDashboard() {
         <CardContent>
           <div className="space-y-4">
             {[
-              { action: 'New user registered', user: 'John Doe', time: '2 hours ago' },
-              { action: 'New store created', user: 'Sarah Store', time: '4 hours ago' },
-              { action: 'Rating submitted', user: 'Mike Johnson', time: '6 hours ago' },
-              { action: 'User role updated', user: 'Admin User', time: '8 hours ago' },
+              {
+                action: 'New user registered',
+                user: 'John Doe',
+                time: '2 hours ago',
+              },
+              {
+                action: 'New store created',
+                user: 'Sarah Store',
+                time: '4 hours ago',
+              },
+              {
+                action: 'Rating submitted',
+                user: 'Mike Johnson',
+                time: '6 hours ago',
+              },
+              {
+                action: 'User role updated',
+                user: 'Admin User',
+                time: '8 hours ago',
+              },
             ].map((item, i) => (
-              <div key={i} className="flex items-center justify-between border-b pb-4 last:border-b-0">
+              <div
+                key={i}
+                className="flex items-center justify-between border-b pb-4 last:border-b-0"
+              >
                 <div>
                   <p className="font-medium text-sm">{item.action}</p>
-                  <p className="text-xs text-muted-foreground">by {item.user}</p>
+                  <p className="text-xs text-muted-foreground">
+                    by {item.user}
+                  </p>
                 </div>
                 <p className="text-xs text-muted-foreground">{item.time}</p>
               </div>

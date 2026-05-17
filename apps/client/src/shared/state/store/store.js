@@ -16,6 +16,7 @@ import storage from 'redux-persist/es/storage';
 import userReducer from '@/features/auth/state/slices/userSlice.js';
 
 import { AuthenticationApi } from '@/features/auth/state/redux-api/Authentication.api';
+import { AdminApi } from '@/features/Roles/admin/state/redux-api/admin.api';
 
 const persistConfig = {
   key: 'auth',
@@ -28,6 +29,7 @@ const store = configureStore({
   reducer: {
     auth: persistedUserReducer,
     [AuthenticationApi.reducerPath]: AuthenticationApi.reducer,
+    [AdminApi.reducerPath]: AdminApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -35,7 +37,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(AuthenticationApi.middleware),
+    }).concat(AuthenticationApi.middleware, AdminApi.middleware),
 });
 
 setupListeners(store.dispatch);

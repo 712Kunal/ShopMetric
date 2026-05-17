@@ -33,7 +33,7 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status !== 401) {
+  if (result?.error?.status !== 403) {
     return result;
   }
 
