@@ -526,8 +526,6 @@ npm run dev
 | GET | /api/stores | Get all stores |
 | GET | /api/stores/:id | Get store details |
 | POST | /api/stores | Create store |
-| PATCH | /api/stores/:id | Update store |
-| DELETE | /api/stores/:id | Delete store |
 
 ---
 
@@ -537,7 +535,6 @@ npm run dev
 | --- | --- | --- |
 | POST | /api/ratings | Add rating |
 | PATCH | /api/ratings/:id | Update rating |
-| DELETE | /api/ratings/:id | Delete rating |
 
 ---
 
